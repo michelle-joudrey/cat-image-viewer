@@ -7,30 +7,31 @@
 //
 
 import UIKit
+import SDWebImage
 
-class CatsViewController : UICollectionViewController {
+class CatsViewController : UICollectionViewController, CatImageSourceDelegate {
+    var catImageSource = CatImageSource()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        catImageSource.delegate = self
+        catImageSource.startLoadingCatImages()
     }
     
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 200
+        return catImageSource.numberOfCatsLoaded()
     }
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CatCollectionViewCell", forIndexPath: indexPath) as! CatCollectionViewCell
         cell.backgroundColor = UIColor.blackColor()
-        cell.catImageView?.image = UIImage(named: "286.jpg")
+        cell.catImageView?.sd_setImageWithURL(catImageSource.urlForCatImageWithIndex(indexPath.row))
         return cell
     }
-
+    
+    func refreshCatImages() {
+        self.collectionView?.reloadData()
+    }
 
 }
 
