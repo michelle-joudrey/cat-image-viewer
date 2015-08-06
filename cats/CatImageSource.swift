@@ -28,16 +28,9 @@ class CatImageSource {
     /// The container for storing loaded cat images parameters
     private var loadedCatImageParams : Array<CatImageParameters> = []
     
-    /// The synchronization mechanism for accessing the loaded cat image parameters over multiple threads
-    private var loadedCatImageParamsQueue = dispatch_queue_create("cats.CatImageSourceQueue", nil)
-    
     /// Returns the number of cats loaded so far
     func numberOfCatImagesLoaded() -> Int {
-        var numLoaded = 0
-        performBlockOnCatImageParameters { () -> Void in
-            numLoaded = self.loadedCatImageParams.count
-        }
-        return numLoaded
+        return self.loadedCatImageParams.count
     }
     
     /**
@@ -58,13 +51,9 @@ class CatImageSource {
                 if cacheType == SDImageCacheType.None {
                     self.createThumbnailOfCatImage(image!, url: imageURL)
                 }
-                self.performBlockOnCatImageParameters({ () -> Void in
-                    self.loadedCatImageParams.append(params)
-                    let index = self.loadedCatImageParams.count - 1
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        self.delegate?.finishedLoadingCatImageWithParameters(params, index: index)
-                    })
-                })
+                self.loadedCatImageParams.append(params)
+                let index = self.loadedCatImageParams.count - 1
+                self.delegate?.finishedLoadingCatImageWithParameters(params, index: index)
         })
     }
     
@@ -75,13 +64,6 @@ class CatImageSource {
             bounds: CGSize(width: 50, height: 50), interpolationQuality: CGInterpolationQuality.Medium)
         let cacheKey = SDWebImageManager.sharedManager().cacheKeyForURL(url) + thumbnailCacheKeySuffix
         SDImageCache.sharedImageCache().storeImage(thumbnail, forKey: cacheKey)
-    }
-    
-    /// Utility function for performing a synchronized operation on loadedCatImageParamsQueue
-    func performBlockOnCatImageParameters(block: () -> Void) {
-        dispatch_sync(self.loadedCatImageParamsQueue) {
-            block()
-        }
     }
     
     /// Cancels any pending cat image -loading requests
@@ -103,11 +85,7 @@ class CatImageSource {
     
     /// Returns the cat image parameters at the specified index
     func catImageParametersAtIndex(index: Int) -> CatImageParameters {
-        var params = CatImageParameters(width: 0, height: 0)
-        performBlockOnCatImageParameters { () -> Void in
-            params = self.loadedCatImageParams[index]
-        }
-        return params
+        return self.loadedCatImageParams[index]
     }
     
     /// Returns the URL for cat image associated with the specified parameters
