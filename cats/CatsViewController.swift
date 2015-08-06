@@ -10,28 +10,39 @@ import UIKit
 import SDWebImage
 import JTSImageViewController
 
-class CatsViewController : UICollectionViewController, CatImageSourceDelegate {
+class CatsViewController : UICollectionViewController {
     var catImageSource = CatImageSource()
+    var numberOfCatImagesToShow = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
         catImageSource.delegate = self
-        catImageSource.startLoadingCatImages()
+        loadCatImages()
+    }
+    
+    // TODO: Move this out of the VC
+    func loadCatImages() {
+        var params = CatImageParameters(width: 0, height: 0)
+        for width in 1...100 {
+            for height in 1...100 {
+                params.width = UInt16(width * 5)
+                params.height = UInt16(height * 5)
+                catImageSource.loadCatImageWithParameters(params)
+            }
+        }
     }
     
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return catImageSource.numberOfCatsLoaded()
+        return numberOfCatImagesToShow
     }
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CatCollectionViewCell", forIndexPath: indexPath) as! CatCollectionViewCell
         cell.backgroundColor = UIColor.blackColor()
-        cell.catImageView?.sd_setImageWithURL(catImageSource.urlForCatImageWithIndex(indexPath.row))
+        let catImageParams = catImageSource.catImageParametersAtIndex(indexPath.row)
+        let catImageURL = catImageSource.urlOfCatImageWithParameters(catImageParams)
+        cell.catImageView?.sd_setImageWithURL(catImageURL)
         return cell
-    }
-    
-    func refreshCatImages() {
-        self.collectionView?.reloadData()
     }
     
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
@@ -44,6 +55,15 @@ class CatsViewController : UICollectionViewController, CatImageSourceDelegate {
             backgroundStyle: JTSImageViewControllerBackgroundOptions.Scaled)
         imageViewer.showFromViewController(self, transition: JTSImageViewControllerTransition.FromOriginalPosition)
     }
-
 }
 
+extension CatsViewController : CatImageSourceDelegate {
+    func finishedLoadingCatImageWithParameters(params: CatImageParameters, index: Int) {
+        ++numberOfCatImagesToShow
+        collectionView?.insertItemsAtIndexPaths([
+            NSIndexPath(forRow: index, inSection: 0) ])
+        if index > 250 {
+            catImageSource.cancelPendingCatImageLoadingRequests()
+        }
+    }
+}

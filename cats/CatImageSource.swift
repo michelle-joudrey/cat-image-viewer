@@ -8,65 +8,91 @@
 
 import SDWebImage
 
-protocol CatImageSourceDelegate {
-    func refreshCatImages()
+/// The parameters for uniquely identifying cat images
+struct CatImageParameters {
+    var width : UInt16
+    var height : UInt16
 }
 
-// TODO: Display thumbnail of kittens
+/// The mechanism for providing cat image -loading updates
+protocol CatImageSourceDelegate {
+    func finishedLoadingCatImageWithParameters(params: CatImageParameters, index: Int)
+}
 
+/// Loads cat images
 class CatImageSource {
     var delegate : CatImageSourceDelegate?
-    var loadedCats : Array<(Int, Int)> = []
-    let numCatsToLoad = 250
     
-    var queue = dispatch_queue_create("cats.CatImageSourceQueue", nil)
+    /// The container for storing loaded cat images parameters
+    private var loadedCatImageParams : Array<CatImageParameters> = []
     
-    func urlForCatImageWithWidth(width: Int, height: Int) -> NSURL {
-        return NSURL(string: "https://placekitten.com/g/\(width)/\(height)")!
-    }
-    func numberOfCatsLoaded() -> Int {
+    /// The synchronization mechanism for accessing the loaded cat image parameters over multiple threads
+    private var loadedCatImageParamsQueue = dispatch_queue_create("cats.CatImageSourceQueue", nil)
+    
+    /**
+        Returns the number of cats loaded so far
+    */
+    func numberOfCatImagesLoaded() -> Int {
         var numLoaded = 0
-        dispatch_sync(self.queue) {
-            numLoaded = self.loadedCats.count
+        performBlockOnCatImageParameters { () -> Void in
+            numLoaded = self.loadedCatImageParams.count
         }
         return numLoaded
     }
-    func urlForCatImageWithIndex(index: Int) -> NSURL {
-        var catAtIndex = (0, 0)
-        dispatch_sync(self.queue) {
-            catAtIndex = self.loadedCats[index]
-        }
-        return urlForCatImageWithWidth(catAtIndex.0, height: catAtIndex.1)
-    }
-    func getCatImageWithWidth(width: Int, height: Int) {
+    
+    /**
+        Loads the cat image with the specified parameters
+        If the image is not found in on-disk or in-memory cache it will be downloaded
+        - Parameters:
+            - params: The parameters of the cat image to load
+    */
+    func loadCatImageWithParameters(params: CatImageParameters) {
         SDWebImageManager.sharedManager().downloadImageWithURL(
-            urlForCatImageWithWidth(width, height: height),
+            urlOfCatImageWithParameters(params),
             options: SDWebImageOptions(rawValue: 0),
             progress: nil,
-            completed: { ( image: UIImage!, error: NSError!, cacheType: SDImageCacheType, finished: Bool, imageURL: NSURL!) -> Void in
+            completed: { ( _, error: NSError!, _, _, imageURL: NSURL!) -> Void in
                 if error != nil { // 0px by 0px image or some other issue
                     return
                 }
-                // prevent race conditions from simultaneous read/write access over multiple threads
-                dispatch_sync(self.queue) {
-                    self.loadedCats.append((width, height))
-                    // TODO: Do this every so many images instead of every one
-                    self.delegate?.refreshCatImages()
-                    if self.loadedCats.count == self.numCatsToLoad {
-                        self.finishedLoadingCats()
-                    }
-                }
+                self.performBlockOnCatImageParameters({ () -> Void in
+                    self.loadedCatImageParams.append(params)
+                    let index = self.loadedCatImageParams.count - 1
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        self.delegate?.finishedLoadingCatImageWithParameters(params, index: index)
+                    })
+                })
         })
     }
-    func startLoadingCatImages() {
-        for width in 1...100 {
-            for height in 1...100 {
-                getCatImageWithWidth(width * 5, height: height * 5)
-            }
+    
+    func performBlockOnCatImageParameters(block: () -> Void) {
+        dispatch_sync(self.loadedCatImageParamsQueue) {
+            block()
         }
     }
-    func finishedLoadingCats() {
-        NSLog("Finished!");
+    
+    /**
+        Cancels any pending cat image -loading requests
+    */
+    func cancelPendingCatImageLoadingRequests() {
         SDWebImageManager.sharedManager().cancelAll()
+    }
+    
+    /**
+        Returns the cat image parameters at the specified index
+    */
+    func catImageParametersAtIndex(index: Int) -> CatImageParameters {
+        var params = CatImageParameters(width: 0, height: 0)
+        performBlockOnCatImageParameters { () -> Void in
+            params = self.loadedCatImageParams[index]
+        }
+        return params
+    }
+    
+    /**
+        Returns the URL for cat image associated with the specified parameters
+    */
+    func urlOfCatImageWithParameters(params: CatImageParameters) -> NSURL {
+        return NSURL(string: "https://placekitten.com/g/\(params.width)/\(params.height)")!
     }
 }
