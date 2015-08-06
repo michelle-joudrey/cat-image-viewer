@@ -16,7 +16,7 @@
 		30266FE21B724F8F00504F8D /* catsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30266FE11B724F8F00504F8D /* catsUITests.swift */; };
 		30266FF01B725E4100504F8D /* CatCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30266FEF1B725E4100504F8D /* CatCollectionViewCell.swift */; };
 		30266FF61B72B29800504F8D /* CatImageSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30266FF51B72B29800504F8D /* CatImageSource.swift */; };
-		302E82E21B738EAD00317D02 /* RBResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302E82E11B738EAD00317D02 /* RBResizer.swift */; };
+		302E82E51B739BF200317D02 /* UIImage+UIImage_Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 302E82E41B739BF200317D02 /* UIImage+UIImage_Resize.m */; };
 		A92C20C506082E14E115C524 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 545647FFD749E6038CC0ECB4 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -54,7 +54,9 @@
 		30266FE31B724F8F00504F8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		30266FEF1B725E4100504F8D /* CatCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatCollectionViewCell.swift; sourceTree = "<group>"; };
 		30266FF51B72B29800504F8D /* CatImageSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatImageSource.swift; sourceTree = "<group>"; };
-		302E82E11B738EAD00317D02 /* RBResizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RBResizer.swift; sourceTree = "<group>"; };
+		302E82E31B739BF200317D02 /* UIImage+UIImage_Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+UIImage_Resize.h"; sourceTree = "<group>"; };
+		302E82E41B739BF200317D02 /* UIImage+UIImage_Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+UIImage_Resize.m"; sourceTree = "<group>"; };
+		302E82E71B739D3600317D02 /* cats-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "cats-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		545647FFD749E6038CC0ECB4 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DFC9C1E7DFAB40F566B0431 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -110,7 +112,9 @@
 		30266FC01B724F8F00504F8D /* cats */ = {
 			isa = PBXGroup;
 			children = (
-				302E82E11B738EAD00317D02 /* RBResizer.swift */,
+				302E82E71B739D3600317D02 /* cats-Bridging-Header.h */,
+				302E82E31B739BF200317D02 /* UIImage+UIImage_Resize.h */,
+				302E82E41B739BF200317D02 /* UIImage+UIImage_Resize.m */,
 				30266FC11B724F8F00504F8D /* AppDelegate.swift */,
 				30266FC31B724F8F00504F8D /* CatsViewController.swift */,
 				30266FC51B724F8F00504F8D /* Main.storyboard */,
@@ -341,10 +345,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				30266FF01B725E4100504F8D /* CatCollectionViewCell.swift in Sources */,
+				302E82E51B739BF200317D02 /* UIImage+UIImage_Resize.m in Sources */,
 				30266FF61B72B29800504F8D /* CatImageSource.swift in Sources */,
 				30266FC41B724F8F00504F8D /* CatsViewController.swift in Sources */,
 				30266FC21B724F8F00504F8D /* AppDelegate.swift in Sources */,
-				302E82E21B738EAD00317D02 /* RBResizer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +493,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = mjoudrey.cats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "cats-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -501,6 +506,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = mjoudrey.cats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "cats-Bridging-Header.h";
 			};
 			name = Release;
 		};

@@ -71,7 +71,8 @@ class CatImageSource {
     let thumbnailCacheKeySuffix = "_t"
 
     func createThumbnailOfCatImage(image: UIImage, url: NSURL) {
-        let thumbnail = RBResizeImage(image, targetSize: CGSize(width: 50, height: 50))
+        let thumbnail =  image.resizedImageWithContentMode(UIViewContentMode.ScaleAspectFill,
+            bounds: CGSize(width: 50, height: 50), interpolationQuality: CGInterpolationQuality.Medium)
         let cacheKey = SDWebImageManager.sharedManager().cacheKeyForURL(url) + thumbnailCacheKeySuffix
         SDImageCache.sharedImageCache().storeImage(thumbnail, forKey: cacheKey)
     }
