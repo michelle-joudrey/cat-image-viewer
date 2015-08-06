@@ -8,6 +8,7 @@
 
 import UIKit
 import SDWebImage
+import JTSImageViewController
 
 class CatsViewController : UICollectionViewController, CatImageSourceDelegate {
     var catImageSource = CatImageSource()
@@ -31,6 +32,17 @@ class CatsViewController : UICollectionViewController, CatImageSourceDelegate {
     
     func refreshCatImages() {
         self.collectionView?.reloadData()
+    }
+    
+    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let imageInfo = JTSImageInfo();
+        let selectedCell = self.collectionView(self.collectionView!, cellForItemAtIndexPath: indexPath) as! CatCollectionViewCell
+        imageInfo.image = selectedCell.catImageView?.image
+        imageInfo.referenceRect = selectedCell.frame
+        imageInfo.referenceView = collectionView
+        let imageViewer = JTSImageViewController(imageInfo: imageInfo, mode: JTSImageViewControllerMode.Image,
+            backgroundStyle: JTSImageViewControllerBackgroundOptions.Scaled)
+        imageViewer.showFromViewController(self, transition: JTSImageViewControllerTransition.FromOriginalPosition)
     }
 
 }

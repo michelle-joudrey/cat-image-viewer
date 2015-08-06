@@ -1,12 +1,26 @@
 PODS:
+  - JTSImageViewController (1.5)
   - SDWebImage (3.7.3):
     - SDWebImage/Core (= 3.7.3)
   - SDWebImage/Core (3.7.3)
 
 DEPENDENCIES:
+  - JTSImageViewController (from `https://github.com/jaredsinclair/JTSImageViewController.git`,
+    tag `1.5`)
   - SDWebImage (~> 3.7)
 
+EXTERNAL SOURCES:
+  JTSImageViewController:
+    :git: https://github.com/jaredsinclair/JTSImageViewController.git
+    :tag: '1.5'
+
+CHECKOUT OPTIONS:
+  JTSImageViewController:
+    :git: https://github.com/jaredsinclair/JTSImageViewController.git
+    :tag: '1.5'
+
 SPEC CHECKSUMS:
+  JTSImageViewController: 89ae3c003060c65418fd3224ebbd67acc6046608
   SDWebImage: 1d2b1a1efda1ade1b00b6f8498865f8ddedc8a84
 
 COCOAPODS: 0.38.2
