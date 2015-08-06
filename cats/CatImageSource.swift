@@ -78,6 +78,12 @@ class CatImageSource {
         SDWebImageManager.sharedManager().cancelAll()
     }
     
+    func cachedCatImageWithParameters(params: CatImageParameters) -> UIImage {
+        let url = urlOfCatImageWithParameters(params)
+        let cacheKey = SDWebImageManager.sharedManager().cacheKeyForURL(url)
+        return SDImageCache.sharedImageCache().imageFromMemoryCacheForKey(cacheKey)
+    }
+    
     /**
         Returns the cat image parameters at the specified index
     */

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SDWebImage
 import JTSImageViewController
 
 class CatsViewController : UICollectionViewController {
@@ -40,8 +39,7 @@ class CatsViewController : UICollectionViewController {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CatCollectionViewCell", forIndexPath: indexPath) as! CatCollectionViewCell
         cell.backgroundColor = UIColor.blackColor()
         let catImageParams = catImageSource.catImageParametersAtIndex(indexPath.row)
-        let catImageURL = catImageSource.urlOfCatImageWithParameters(catImageParams)
-        cell.catImageView?.sd_setImageWithURL(catImageURL)
+        cell.catImageView?.image = catImageSource.cachedCatImageWithParameters(catImageParams)
         return cell
     }
     
