@@ -19,7 +19,7 @@ class CatsViewController : UICollectionViewController {
         loadCatImages()
     }
     
-    // TODO: Move this out of the VC
+    /// Generates some cat image parameters, and loads the associated images
     func loadCatImages() {
         var params = CatImageParameters(width: 0, height: 0)
         for width in 1...100 {
@@ -60,7 +60,7 @@ extension CatsViewController : CatImageSourceDelegate {
         ++numberOfCatImagesToShow
         collectionView?.insertItemsAtIndexPaths([
             NSIndexPath(forRow: index, inSection: 0) ])
-        if index > 250 {
+        if index > 250 { // Okay, I think we have enough cats for now
             catImageSource.cancelPendingCatImageLoadingRequests()
         }
     }

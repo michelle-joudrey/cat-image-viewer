@@ -21,6 +21,7 @@ protocol CatImageSourceDelegate {
 
 /// Loads cat images
 class CatImageSource {
+    /// The object to provide cat image -loading updates to
     var delegate : CatImageSourceDelegate?
     
     /// The container for storing loaded cat images parameters
@@ -29,9 +30,7 @@ class CatImageSource {
     /// The synchronization mechanism for accessing the loaded cat image parameters over multiple threads
     private var loadedCatImageParamsQueue = dispatch_queue_create("cats.CatImageSourceQueue", nil)
     
-    /**
-        Returns the number of cats loaded so far
-    */
+    /// Returns the number of cats loaded so far
     func numberOfCatImagesLoaded() -> Int {
         var numLoaded = 0
         performBlockOnCatImageParameters { () -> Void in
@@ -65,28 +64,26 @@ class CatImageSource {
         })
     }
     
+    /// Utility function for performing a synchronized operation on loadedCatImageParamsQueue
     func performBlockOnCatImageParameters(block: () -> Void) {
         dispatch_sync(self.loadedCatImageParamsQueue) {
             block()
         }
     }
     
-    /**
-        Cancels any pending cat image -loading requests
-    */
+    /// Cancels any pending cat image -loading requests
     func cancelPendingCatImageLoadingRequests() {
         SDWebImageManager.sharedManager().cancelAll()
     }
     
+    /// Returns the cached cat image with the specified parameters
     func cachedCatImageWithParameters(params: CatImageParameters) -> UIImage {
         let url = urlOfCatImageWithParameters(params)
         let cacheKey = SDWebImageManager.sharedManager().cacheKeyForURL(url)
         return SDImageCache.sharedImageCache().imageFromMemoryCacheForKey(cacheKey)
     }
     
-    /**
-        Returns the cat image parameters at the specified index
-    */
+    /// Returns the cat image parameters at the specified index
     func catImageParametersAtIndex(index: Int) -> CatImageParameters {
         var params = CatImageParameters(width: 0, height: 0)
         performBlockOnCatImageParameters { () -> Void in
@@ -95,9 +92,7 @@ class CatImageSource {
         return params
     }
     
-    /**
-        Returns the URL for cat image associated with the specified parameters
-    */
+    /// Returns the URL for cat image associated with the specified parameters
     func urlOfCatImageWithParameters(params: CatImageParameters) -> NSURL {
         return NSURL(string: "https://placekitten.com/g/\(params.width)/\(params.height)")!
     }
