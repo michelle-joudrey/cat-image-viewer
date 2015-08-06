@@ -7,6 +7,7 @@
 //
 
 import SDWebImage
+import ImageIO
 
 /// The parameters for uniquely identifying cat images
 struct CatImageParameters {
@@ -50,9 +51,12 @@ class CatImageSource {
             urlOfCatImageWithParameters(params),
             options: SDWebImageOptions(rawValue: 0),
             progress: nil,
-            completed: { ( _, error: NSError!, _, _, imageURL: NSURL!) -> Void in
+            completed: { ( image : UIImage?, error: NSError!, cacheType: SDImageCacheType, _, imageURL: NSURL!) -> Void in
                 if error != nil { // 0px by 0px image or some other issue
                     return
+                }
+                if cacheType == SDImageCacheType.None {
+                    self.createThumbnailOfCatImage(image!, url: imageURL)
                 }
                 self.performBlockOnCatImageParameters({ () -> Void in
                     self.loadedCatImageParams.append(params)
@@ -62,6 +66,14 @@ class CatImageSource {
                     })
                 })
         })
+    }
+    
+    let thumbnailCacheKeySuffix = "_t"
+
+    func createThumbnailOfCatImage(image: UIImage, url: NSURL) {
+        let thumbnail = RBResizeImage(image, targetSize: CGSize(width: 50, height: 50))
+        let cacheKey = SDWebImageManager.sharedManager().cacheKeyForURL(url) + thumbnailCacheKeySuffix
+        SDImageCache.sharedImageCache().storeImage(thumbnail, forKey: cacheKey)
     }
     
     /// Utility function for performing a synchronized operation on loadedCatImageParamsQueue
@@ -76,11 +88,16 @@ class CatImageSource {
         SDWebImageManager.sharedManager().cancelAll()
     }
     
-    /// Returns the cached cat image with the specified parameters
-    func cachedCatImageWithParameters(params: CatImageParameters) -> UIImage {
+    /// Returns the cached cat image with the specified parameters, optionally the thumbnail
+    func cachedCatImageWithParameters(params: CatImageParameters, getThumbnail: Bool) -> UIImage {
         let url = urlOfCatImageWithParameters(params)
-        let cacheKey = SDWebImageManager.sharedManager().cacheKeyForURL(url)
-        return SDImageCache.sharedImageCache().imageFromMemoryCacheForKey(cacheKey)
+        var cacheKey = SDWebImageManager.sharedManager().cacheKeyForURL(url)
+        if getThumbnail {
+            cacheKey = cacheKey + thumbnailCacheKeySuffix
+        }
+        // note: imageFromDiskCacheForKey will first attempt to read from the
+        // in-memory cache before reading from the disk
+        return SDImageCache.sharedImageCache().imageFromDiskCacheForKey(cacheKey)
     }
     
     /// Returns the cat image parameters at the specified index

@@ -16,6 +16,7 @@
 		30266FE21B724F8F00504F8D /* catsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30266FE11B724F8F00504F8D /* catsUITests.swift */; };
 		30266FF01B725E4100504F8D /* CatCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30266FEF1B725E4100504F8D /* CatCollectionViewCell.swift */; };
 		30266FF61B72B29800504F8D /* CatImageSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30266FF51B72B29800504F8D /* CatImageSource.swift */; };
+		302E82E21B738EAD00317D02 /* RBResizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302E82E11B738EAD00317D02 /* RBResizer.swift */; };
 		A92C20C506082E14E115C524 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 545647FFD749E6038CC0ECB4 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		30266FE31B724F8F00504F8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		30266FEF1B725E4100504F8D /* CatCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatCollectionViewCell.swift; sourceTree = "<group>"; };
 		30266FF51B72B29800504F8D /* CatImageSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CatImageSource.swift; sourceTree = "<group>"; };
+		302E82E11B738EAD00317D02 /* RBResizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RBResizer.swift; sourceTree = "<group>"; };
 		545647FFD749E6038CC0ECB4 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DFC9C1E7DFAB40F566B0431 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -108,6 +110,7 @@
 		30266FC01B724F8F00504F8D /* cats */ = {
 			isa = PBXGroup;
 			children = (
+				302E82E11B738EAD00317D02 /* RBResizer.swift */,
 				30266FC11B724F8F00504F8D /* AppDelegate.swift */,
 				30266FC31B724F8F00504F8D /* CatsViewController.swift */,
 				30266FC51B724F8F00504F8D /* Main.storyboard */,
@@ -341,6 +344,7 @@
 				30266FF61B72B29800504F8D /* CatImageSource.swift in Sources */,
 				30266FC41B724F8F00504F8D /* CatsViewController.swift in Sources */,
 				30266FC21B724F8F00504F8D /* AppDelegate.swift in Sources */,
+				302E82E21B738EAD00317D02 /* RBResizer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
