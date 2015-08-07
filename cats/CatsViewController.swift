@@ -12,12 +12,15 @@ import JTSImageViewController
 class CatsViewController : UICollectionViewController {
     var catImageSource = CatImageSource()
     var numberOfCatImagesToShow = 0
-    var numberOfQueuedCatImagesToLoad = 0 {
-        didSet {
-            if numberOfQueuedCatImagesToLoad == 0 && catImageSource.delegate != nil {
-                if self.numberOfCatImagesToShow < 100 {
-                    loadSomeCatImages()
-                }
+    var numberOfQueuedCatImagesToLoad = 0
+    
+    /// Decrements numberOfQueuedCatImagesToLoad variable and
+    /// checks to see if more images should be loaded from the image source
+    func decrementNumberOfQueuedCatImagesToLoad() {
+        --numberOfQueuedCatImagesToLoad
+        if numberOfQueuedCatImagesToLoad == 0 && catImageSource.delegate != nil {
+            if self.numberOfCatImagesToShow < 100 {
+                loadSomeCatImages()
             }
         }
     }
@@ -69,11 +72,7 @@ class CatsViewController : UICollectionViewController {
     
     func stopLoadingCatImages() {
         catImageSource.cancelPendingCatImageLoadingRequests()
-        // Prevent loadSomeCatImages() from getting called
-        // in didSet numberOfQueuedCatImagesToLoad
-        catImageSource.delegate = nil
         numberOfQueuedCatImagesToLoad = 0
-        catImageSource.delegate = self
     }
 }
 
@@ -82,17 +81,20 @@ extension CatsViewController : CatImageSourceDelegate {
         ++numberOfCatImagesToShow
         collectionView?.insertItemsAtIndexPaths([
             NSIndexPath(forRow: index, inSection: 0) ])
-        --numberOfQueuedCatImagesToLoad
+        decrementNumberOfQueuedCatImagesToLoad()
     }
     
     func failedToLoadCatImageWithError(error: NSError) {
-        --numberOfQueuedCatImagesToLoad
-        if error.code != 0 { // 0 occurs when a 0 pixel image is downloaded
-            // We are probably rate-limited at the moment, so cancel any queued loads
-            // since they will probably 503 as well
-            stopLoadingCatImages()
-            showErrorAlert(error)
+        decrementNumberOfQueuedCatImagesToLoad()
+        let errorCodesToIgnore = [
+            0,    // Occurs when a 0 pixel image is downloaded
+            -1100 // Unknown. AFAIK this doesn't indicate that future images will fail to load
+        ]
+        if errorCodesToIgnore.contains(error.code) {
+            return
         }
+        stopLoadingCatImages()
+        showErrorAlert(error)
     }
     
     func showErrorAlert(error: NSError) {
@@ -106,6 +108,9 @@ extension CatsViewController : CatImageSourceDelegate {
             handler: { (_) -> Void in
                 self.dismissViewControllerAnimated(true, completion:nil)
         }));
-        self.presentViewController(alertController, animated: true, completion: nil)
+        // The topmost view controller could be the JTSImageViewController;
+        // If it is, the UIAlertController must be presented on it
+        let activeViewController = self.presentedViewController != nil ? self.presentedViewController! : self
+        activeViewController.presentViewController(alertController, animated: true, completion: nil)
     }
 }
