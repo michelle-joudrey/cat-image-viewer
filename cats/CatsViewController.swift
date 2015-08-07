@@ -71,7 +71,11 @@ class CatsViewController : UICollectionViewController {
     
     func stopLoadingCatImages() {
         catImageSource.cancelPendingCatImageLoadingRequests()
+        // Prevent loadSomeCatImages() from getting called
+        // in didSet numberOfQueuedCatImagesToLoad
+        catImageSource.delegate = nil
         numberOfQueuedCatImagesToLoad = 0
+        catImageSource.delegate = self
     }
 }
 
