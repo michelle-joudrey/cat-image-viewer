@@ -21,7 +21,6 @@ class CatsViewController : UICollectionViewController {
             }
         }
     }
-    var hasWarnedUserAbout503 = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +31,6 @@ class CatsViewController : UICollectionViewController {
     
     /// Returns random multiple of 10 from [300, 1000]
     func randomImageDimension() -> UInt16 {
-        
         return UInt16((arc4random_uniform(70) + 31) * 10)
     }
     
@@ -89,22 +87,18 @@ extension CatsViewController : CatImageSourceDelegate {
     
     func failedToLoadCatImageWithError(error: NSError) {
         --numberOfQueuedCatImagesToLoad
-        if error.code == 503 {
-            if hasWarnedUserAbout503 {
-                return
-            }
+        if error.code != 0 { // 0 occurs when a 0 pixel image is downloaded
             // We are probably rate-limited at the moment, so cancel any queued loads
             // since they will probably 503 as well
             stopLoadingCatImages()
-            hasWarnedUserAbout503 = true
-            show503Alert()
+            showErrorAlert(error)
         }
     }
     
-    func show503Alert() {
+    func showErrorAlert(error: NSError) {
         let alertController = UIAlertController(
-            title: "Service unavailable",
-            message: "Cat image service temporarily unavailable (503)",
+            title: "Error loading cat image",
+            message: error.localizedDescription,
             preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(
             title: "Ok",
