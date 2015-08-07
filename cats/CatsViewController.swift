@@ -97,12 +97,21 @@ extension CatsViewController : CatImageSourceDelegate {
                 return
             }
             hasWarnedUserAbout503 = true
-            self.presentViewController(
-            UIAlertController(
-                title: "Service unavailable",
-                message: "Cat image service temporarily unavailable (503)",
-                preferredStyle: UIAlertControllerStyle.Alert),
-                animated: true, completion: nil)
+            show503Alert()
         }
+    }
+    
+    func show503Alert() {
+        let alertController = UIAlertController(
+            title: "Service unavailable",
+            message: "Cat image service temporarily unavailable (503)",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        alertController.addAction(UIAlertAction(
+            title: "Ok",
+            style: UIAlertActionStyle.Default,
+            handler: { (_) -> Void in
+                self.dismissViewControllerAnimated(true, completion:nil)
+        }));
+        self.presentViewController(alertController, animated: true, completion: nil)
     }
 }
