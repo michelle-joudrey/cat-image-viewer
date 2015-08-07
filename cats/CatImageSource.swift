@@ -26,6 +26,9 @@ class CatImageSource {
     /// The object to provide cat image -loading updates to
     var delegate : CatImageSourceDelegate?
     
+    /// The size to use for thumbnail images
+    var thumbnailSize = CGSize(width: 50, height: 50)
+    
     /// The container for storing loaded cat images parameters
     private var loadedCatImageParams : Array<CatImageParameters> = []
     
@@ -84,7 +87,7 @@ class CatImageSource {
     /// Creates a thumbnail of the specified cat image and stores in the image cache
     func createThumbnailOfCatImage(image: UIImage, url: NSURL) {
         let thumbnail = image.resizedImageWithContentMode(UIViewContentMode.ScaleAspectFill,
-            bounds: CGSize(width: 50, height: 50), interpolationQuality: CGInterpolationQuality.Medium)
+            bounds: thumbnailSize, interpolationQuality: CGInterpolationQuality.Medium)
         let cacheKey = cacheKeyForImageWithURL(url, forThumbnail: true)
         SDImageCache.sharedImageCache().storeImage(thumbnail, forKey: cacheKey)
     }

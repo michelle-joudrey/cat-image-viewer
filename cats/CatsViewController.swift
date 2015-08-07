@@ -15,7 +15,7 @@ class CatsViewController : UICollectionViewController {
     var numberOfQueuedCatImagesToLoad = 0 {
         didSet {
             if numberOfQueuedCatImagesToLoad == 0 && catImageSource.delegate != nil {
-                if self.numberOfCatImagesToShow < 1000 {
+                if self.numberOfCatImagesToShow < 100 {
                     loadSomeCatImages()
                 }
             }
@@ -30,8 +30,9 @@ class CatsViewController : UICollectionViewController {
         loadSomeCatImages()
     }
     
+    /// Returns random multiple of 10 from [300, 1000]
     func randomImageDimension() -> UInt16 {
-        // random multiple of 10 from [300, 1000]
+        
         return UInt16((arc4random_uniform(70) + 31) * 10)
     }
     
@@ -53,7 +54,6 @@ class CatsViewController : UICollectionViewController {
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CatCollectionViewCell", forIndexPath: indexPath) as! CatCollectionViewCell
-        cell.backgroundColor = UIColor.blackColor()
         cell.catImageView?.image = catImageSource.cachedCatImageWithIndex(indexPath.row, getThumbnail: true)
         return cell
     }
@@ -91,11 +91,11 @@ extension CatsViewController : CatImageSourceDelegate {
         --numberOfQueuedCatImagesToLoad
         if error.code == 503 {
             if hasWarnedUserAbout503 {
-                // We are probably rate-limited at the moment, so cancel any queued loads
-                // since they will probably 503 as well
-                stopLoadingCatImages()
                 return
             }
+            // We are probably rate-limited at the moment, so cancel any queued loads
+            // since they will probably 503 as well
+            stopLoadingCatImages()
             hasWarnedUserAbout503 = true
             show503Alert()
         }
