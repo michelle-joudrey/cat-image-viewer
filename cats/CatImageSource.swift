@@ -18,6 +18,8 @@ struct CatImageParameters {
 /// The mechanism for providing cat image -loading updates
 protocol CatImageSourceDelegate {
     func finishedLoadingCatImageWithParameters(params: CatImageParameters, index: Int)
+    func failedToLoadCatImageWithError(error : NSError)
+    func finishedLoadingAllQueuedCatImages()
 }
 
 /// Loads cat images
@@ -33,19 +35,42 @@ class CatImageSource {
         return self.loadedCatImageParams.count
     }
     
+    /// The maximum number cat images to download simultaneously
+    var maxConcurrentCatImageDownloads = 0 {
+        didSet {
+            SDWebImageDownloader.sharedDownloader().maxConcurrentDownloads = maxConcurrentCatImageDownloads
+        }
+    }
+    
+    /// The number cat images queued for loading
+    private var numberOfQueuedCatImageLoads = 0 {
+        didSet {
+            if numberOfQueuedCatImageLoads == 0 {
+                self.delegate?.finishedLoadingAllQueuedCatImages()
+            }
+        }
+    }
+    
     /**
-        Loads the cat image with the specified parameters
-        If the image is not found in on-disk or in-memory cache it will be downloaded
+        Queues the loading of the cat image with the specified parameters.
+        If the image is not found in on-disk or in-memory cache it will be downloaded.
+        If the fails to load, the delegate method failedToLoadCatImageWithError will be called.
+        if the image finishes loading successfully, the delegate method 
+           finishedLoadingCatImageWithParameters will be called.
         - Parameters:
             - params: The parameters of the cat image to load
     */
     func loadCatImageWithParameters(params: CatImageParameters) {
-        SDWebImageManager.sharedManager().downloadImageWithURL(
+        ++numberOfQueuedCatImageLoads
+        let imageManager = SDWebImageManager.sharedManager()
+        imageManager.downloadImageWithURL(
             urlOfCatImageWithParameters(params),
-            options: SDWebImageOptions(rawValue: 0),
+            options: SDWebImageOptions.LowPriority, // Give performance priority to UI
             progress: nil,
             completed: { ( image : UIImage?, error: NSError!, cacheType: SDImageCacheType, _, imageURL: NSURL!) -> Void in
+                --self.numberOfQueuedCatImageLoads
                 if error != nil { // 0px by 0px image or some other issue
+                    self.delegate?.failedToLoadCatImageWithError(error)
                     return
                 }
                 if cacheType == SDImageCacheType.None {
@@ -69,6 +94,13 @@ class CatImageSource {
     /// Cancels any pending cat image -loading requests
     func cancelPendingCatImageLoadingRequests() {
         SDWebImageManager.sharedManager().cancelAll()
+        let delegateRef = self.delegate
+        self.delegate = nil
+        // if this method has been called, then they probably don't expect
+        // finishedLoadingAllQueuedCatImages to be called afterwards,
+        // so prevent that from happening
+        self.numberOfQueuedCatImageLoads = 0
+        self.delegate = delegateRef
     }
     
     /// Returns the cached cat image with the specified parameters, optionally the thumbnail
