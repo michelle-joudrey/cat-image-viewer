@@ -96,6 +96,12 @@ class CatImageSource {
         return SDImageCache.sharedImageCache().imageFromDiskCacheForKey(cacheKey)
     }
     
+    // Convienence function
+    func cachedCatImageWithIndex(index: Int, getThumbnail: Bool) -> UIImage {
+        let catImageParams = catImageParametersAtIndex(index)
+        return cachedCatImageWithParameters(catImageParams, getThumbnail: false)
+    }
+    
     /// Returns the cat image parameters at the specified index
     func catImageParametersAtIndex(index: Int) -> CatImageParameters {
         return self.loadedCatImageParams[index]

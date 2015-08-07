@@ -54,16 +54,14 @@ class CatsViewController : UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CatCollectionViewCell", forIndexPath: indexPath) as! CatCollectionViewCell
         cell.backgroundColor = UIColor.blackColor()
-        let catImageParams = catImageSource.catImageParametersAtIndex(indexPath.row)
-        cell.catImageView?.image = catImageSource.cachedCatImageWithParameters(catImageParams, getThumbnail: true)
+        cell.catImageView?.image = catImageSource.cachedCatImageWithIndex(indexPath.row, getThumbnail: true)
         return cell
     }
     
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let imageInfo = JTSImageInfo();
         let selectedCell = self.collectionView(self.collectionView!, cellForItemAtIndexPath: indexPath) as! CatCollectionViewCell
-        let catImageParams = catImageSource.catImageParametersAtIndex(indexPath.row)
-        imageInfo.image = catImageSource.cachedCatImageWithParameters(catImageParams, getThumbnail: false)
+        imageInfo.image = catImageSource.cachedCatImageWithIndex(indexPath.row, getThumbnail: false)
         imageInfo.referenceRect = selectedCell.frame
         imageInfo.referenceView = collectionView
         let imageViewer = JTSImageViewController(imageInfo: imageInfo, mode: JTSImageViewControllerMode.Image,
