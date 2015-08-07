@@ -12,6 +12,15 @@ import JTSImageViewController
 class CatsViewController : UICollectionViewController {
     var catImageSource = CatImageSource()
     var numberOfCatImagesToShow = 0
+    var numberOfQueuedCatImagesToLoad = 0 {
+        didSet {
+            if numberOfQueuedCatImagesToLoad == 0 && catImageSource.delegate != nil {
+                if self.numberOfCatImagesToShow < 1000 {
+                    loadSomeCatImages()
+                }
+            }
+        }
+    }
     var hasWarnedUserAbout503 = false
 
     override func viewDidLoad() {
@@ -28,8 +37,10 @@ class CatsViewController : UICollectionViewController {
     
     /// Generates some cat image parameters, and loads the associated images
     func loadSomeCatImages() {
+        let numToLoad = 10
+        numberOfQueuedCatImagesToLoad += numToLoad
         var params = CatImageParameters(width: 0, height: 0)
-        for _ in 1...10 {
+        for _ in 1...numToLoad {
             params.width = randomImageDimension()
             params.height = randomImageDimension()
             catImageSource.loadCatImageWithParameters(params)
@@ -59,6 +70,11 @@ class CatsViewController : UICollectionViewController {
             backgroundStyle: JTSImageViewControllerBackgroundOptions.Scaled)
         imageViewer.showFromViewController(self, transition: JTSImageViewControllerTransition.FromOriginalPosition)
     }
+    
+    func stopLoadingCatImages() {
+        catImageSource.cancelPendingCatImageLoadingRequests()
+        numberOfQueuedCatImagesToLoad = 0
+    }
 }
 
 extension CatsViewController : CatImageSourceDelegate {
@@ -66,14 +82,16 @@ extension CatsViewController : CatImageSourceDelegate {
         ++numberOfCatImagesToShow
         collectionView?.insertItemsAtIndexPaths([
             NSIndexPath(forRow: index, inSection: 0) ])
+        --numberOfQueuedCatImagesToLoad
     }
     
     func failedToLoadCatImageWithError(error: NSError) {
+        --numberOfQueuedCatImagesToLoad
         if error.code == 503 {
             if hasWarnedUserAbout503 {
                 // We are probably rate-limited at the moment, so cancel any queued loads
                 // since they will probably 503 as well
-                catImageSource.cancelPendingCatImageLoadingRequests()
+                stopLoadingCatImages()
                 return
             }
             hasWarnedUserAbout503 = true
@@ -83,12 +101,6 @@ extension CatsViewController : CatImageSourceDelegate {
                 message: "Cat image service temporarily unavailable (503)",
                 preferredStyle: UIAlertControllerStyle.Alert),
                 animated: true, completion: nil)
-        }
-    }
-    
-    func finishedLoadingAllQueuedCatImages() {
-        if catImageSource.numberOfCatImagesLoaded() < 250 {
-            loadSomeCatImages()
         }
     }
 }
