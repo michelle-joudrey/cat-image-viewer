@@ -11,7 +11,12 @@ import JTSImageViewController
 
 class CatsViewController : UICollectionViewController {
     var catImageSource = CatImageSource()
+    
+    /// The number of images to show in the collectionview
     var numberOfCatImagesToShow = 0
+    
+    /// A counter used for keeping track of when 
+    /// more images  should be loaded
     var numberOfQueuedCatImagesToLoad = 0
     
     /// Decrements numberOfQueuedCatImagesToLoad variable and
